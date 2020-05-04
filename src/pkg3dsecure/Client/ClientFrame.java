@@ -6,6 +6,7 @@
 package pkg3dsecure.Client;
 
 import CertFile.CertFile;
+import java.awt.List;
 import pkg3dsecure.ACS.authServer.ReponseAuth;
 import pkg3dsecure.ACS.authServer.RequeteAuth;
 import java.io.IOException;
@@ -13,10 +14,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -56,16 +68,15 @@ public class ClientFrame extends javax.swing.JFrame {
         NomClientTF = new javax.swing.JTextField();
         NumSerieLabel = new javax.swing.JLabel();
         NumSerieTF = new javax.swing.JTextField();
-        DebugScrollPanel = new javax.swing.JScrollPane();
-        DebugTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Authentification");
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         RequestPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         RequestPanel.setLayout(new java.awt.GridLayout(3, 2, 5, 5));
 
-        NomLabel.setText("Nom");
+        NomLabel.setText("Identifiant");
         NomLabel.setMaximumSize(new java.awt.Dimension(150, 16));
         NomLabel.setMinimumSize(new java.awt.Dimension(150, 16));
         NomLabel.setPreferredSize(new java.awt.Dimension(150, 16));
@@ -131,45 +142,21 @@ public class ClientFrame extends javax.swing.JFrame {
         gridBagConstraints.gridy = 1;
         getContentPane().add(AnswerPanel, gridBagConstraints);
 
-        DebugScrollPanel.setPreferredSize(new java.awt.Dimension(300, 275));
-
-        DebugTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Date", "Info"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Object.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        DebugTable.setMaximumSize(new java.awt.Dimension(100, 0));
-        DebugTable.setPreferredSize(new java.awt.Dimension(100, 0));
-        DebugScrollPanel.setViewportView(DebugTable);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        getContentPane().add(DebugScrollPanel, gridBagConstraints);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void AuthButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AuthButtonActionPerformed
         try {
+            //Vérification des paramètres
+            String nom = NomTF.getText();
+            String pin = new String(PINTF.getPassword());
+            if(nom.length()==0||pin.length()!=4){
+                System.out.println("Input incorrect");
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Veuillez introduire des données dans le bon format","",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
             //Connexion au serveur sur le port non SSL
             System.out.println("Connexion au serveur sur le port non-SSL");
             String adresse = "localhost";
@@ -186,7 +173,7 @@ public class ClientFrame extends javax.swing.JFrame {
             System.out.println("SSL - " + isSsl);
             if(!isSsl.equals("no-SSL")){
                 int portSSL = Integer.parseInt(isSsl.substring(isSsl.lastIndexOf("#")+1));
-                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/key/acs_keystore.jks","password","password");
+                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/java/key/acs_keystore.jks","password","password");
                 SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket("localhost", portSSL);
                 ois = new ObjectInputStream(SslSocket.getInputStream());
                 oos = new ObjectOutputStream(SslSocket.getOutputStream());
@@ -194,9 +181,18 @@ public class ClientFrame extends javax.swing.JFrame {
             
             //Envoie de la requête
             System.out.println("Envoie de la requête");
-            String chargeUtile = NomTF.getText() + "#" + new String(PINTF.getPassword());
-            RequeteAuth req = new RequeteAuth(RequeteAuth.REQUEST_AUTH,chargeUtile);
+            Date date = new Date();
+            DateFormat df = new SimpleDateFormat("dd/MM/yyy");
             
+            String sDate = df.format(date);
+            byte[] digest = makeDigest(sDate,nom,pin);
+            
+            System.out.println("Nom = " + nom);
+            System.out.println("Date = " + sDate);
+            System.out.println("PIN = " + pin);
+            String chargeUtile = nom + "#" + sDate;
+            
+            RequeteAuth req = new RequeteAuth(RequeteAuth.REQUEST_AUTH,chargeUtile,digest);  
             oos.writeObject(req);
             oos.flush();
             
@@ -205,6 +201,21 @@ public class ClientFrame extends javax.swing.JFrame {
             ReponseAuth rep = (ReponseAuth)ois.readObject();
             System.out.println("Reponse reçue : " + rep.getChargeUtile());
             
+            if(rep.getCode()==ReponseAuth.AUTH_OK){
+                String repdata = rep.getChargeUtile();
+                StringTokenizer tokenizer = new StringTokenizer(repdata,"#");
+
+                String nomBanque = tokenizer.nextToken();
+                String nomC = tokenizer.nextToken();
+                String serial = tokenizer.nextToken();
+                NomBanqueTF.setText(nomBanque);
+                NomClientTF.setText(nomC);
+                NumSerieTF.setText(serial);
+                
+            }else{
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Authentification refusée","",JOptionPane.ERROR_MESSAGE);
+            }
             
             //LReponse.setText(rep.getChargeUtile());
         } catch (IOException ex) {
@@ -212,8 +223,22 @@ public class ClientFrame extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             System.err.println("ClassNotFoundException - " + ex);
         }
+
     }//GEN-LAST:event_AuthButtonActionPerformed
 
+    private byte[] makeDigest(String date, String nom, String pin){
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA");
+            md.update(nom.getBytes());
+            md.update(date.getBytes());
+            md.update(pin.getBytes());
+            byte[] digest = md.digest();
+            return digest;
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
     /**
      * @param args the command line arguments
      */
@@ -252,8 +277,6 @@ public class ClientFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel AnswerPanel;
     private javax.swing.JButton AuthButton;
-    private javax.swing.JScrollPane DebugScrollPanel;
-    private javax.swing.JTable DebugTable;
     private javax.swing.JPanel EmptyPanel;
     private javax.swing.JLabel NomBanqueLabel;
     private javax.swing.JTextField NomBanqueTF;

@@ -5,19 +5,25 @@
  */
 package pkg3dsecure.ACQ;
 
+import CertFile.CertFile;
+import Reqpay.reqpayPanel;
 import java.awt.GridLayout;
 import java.io.File;
+import static java.lang.System.exit;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import serveurthreaddemande.ServeurPanel;
 import utilitaires.ServerProperties;
+import utilitaires.VerificationServer;
 
 /**
  *
  * @author Aurélien Bolkaerts
  */
 public class ACQMain {
+    static ServerProperties spReqpay, spMoney;
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -28,8 +34,13 @@ public class ACQMain {
     }
     
     private static void loadProperties(){
-        File file = new File("src\\pkg3dsecure\\ACQ\\money.properties");
-        ServerProperties sp = new ServerProperties(file);
+        System.out.println("Chargement des fichiers de propriétés des serveurs.");
+        
+        File authPropertiesFile = new File("src\\pkg3dsecure\\ACQ\\reqpay.properties");
+        spReqpay = new ServerProperties(authPropertiesFile);
+     
+        File moneyPropertiesFile = new File("src\\pkg3dsecure\\ACQ\\money.properties");
+        spMoney = new ServerProperties(moneyPropertiesFile);
     }
    
     private static void initComponents(){
@@ -48,16 +59,29 @@ public class ACQMain {
         //Ajout du tabbedPane
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
  
-        tabbedPane.addTab("Money", makeServeurPanel("Money",2400));
-        tabbedPane.addTab("Requête de demande de paiement", makeServeurPanel("Requête de demande de paiement",2500));
+        System.out.println(spReqpay);
+        tabbedPane.addTab(spReqpay.getTitle(), makeReqPayServeurPanel(spReqpay.getTitle(),
+                                                                spReqpay.getPort(),
+                                                                spReqpay.getPortSSL(),
+                                                                spReqpay.getFichierKeystore(),
+                                                                spReqpay.getPasswordKeystore(),
+                                                                spReqpay.getPasswordKey()));
  
         frame.getContentPane().add(tabbedPane);
     }
     
-    private static JPanel makeServeurPanel(String titre, int port){
-        //ServeurPanel sp = new ServeurPanel(titre,port);
+    private static JPanel makeReqPayServeurPanel(String titre, int port, int portSSL, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+        VerificationServer vs = new VerificationServer();
+        if(!vs.ping("127.0.0.1")){
+            System.out.println("Le serveur money doit être lancé");
+            JFrame f = new JFrame();
+            JOptionPane.showMessageDialog(f,"Le serveur ACS doit être lancé avant celui-ci","Démarrage du serveur ACS nécessaire!",JOptionPane.ERROR_MESSAGE);
+            exit(-1);
+        }
+        vs.SNMPRequest("test");
+        reqpayPanel sp = new reqpayPanel(titre,port,portSSL,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
         JPanel p = new JPanel();
-        //p.add(sp);
+        p.add(sp);
         p.setLayout(new GridLayout(1,1));
         return p;
     }

@@ -6,14 +6,16 @@
 package pkg3dsecure.Client;
 
 import CertFile.CertFile;
+import Reqpay.ReponsePay;
+import Reqpay.RequetePay;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import pkg3dsecure.ACS.authServer.ReponseAuth;
-import pkg3dsecure.ACS.authServer.RequeteAuth;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -40,7 +42,7 @@ public class TransactionFrame extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jLabel1 = new javax.swing.JLabel();
+        Source = new javax.swing.JLabel();
         SourceTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         DestinationTextField = new javax.swing.JTextField();
@@ -48,21 +50,19 @@ public class TransactionFrame extends javax.swing.JFrame {
         MontantSpinner = new javax.swing.JSpinner();
         jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        HistoriquePanel = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Demande de transaction");
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel1.setText("Vendeur :");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        Source.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Source.setText("Source :");
+        Source.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        getContentPane().add(jLabel1, gridBagConstraints);
+        getContentPane().add(Source, gridBagConstraints);
 
         SourceTextField.setMinimumSize(new java.awt.Dimension(200, 22));
         SourceTextField.setPreferredSize(new java.awt.Dimension(200, 22));
@@ -71,7 +71,7 @@ public class TransactionFrame extends javax.swing.JFrame {
         gridBagConstraints.gridy = 1;
         getContentPane().add(SourceTextField, gridBagConstraints);
 
-        jLabel2.setText("Acheteur : ");
+        jLabel2.setText("Destination :");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -120,39 +120,22 @@ public class TransactionFrame extends javax.swing.JFrame {
         gridBagConstraints.gridwidth = 2;
         getContentPane().add(jLabel4, gridBagConstraints);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Date", "Vendeur", "Acheteur", "Montant", "Résultat"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Boolean.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        HistoriquePanel.setViewportView(jTable1);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
-        getContentPane().add(HistoriquePanel, gridBagConstraints);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try{
+            //Vérification des champs
+            if(SourceTextField.getText().length()!=8 || DestinationTextField.getText().length()!=8){
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Veuillez introduire des données dans le bon format","",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
             //Connexion au serveur sur le port non SSL
             System.out.println("Connexion au serveur sur le port non-SSL");
             String adresse = "localhost";
-            int port = 2500;
+            int port = 2600;
             
             cliSock = new Socket(adresse,port);
             ois = new ObjectInputStream(cliSock.getInputStream());
@@ -165,7 +148,7 @@ public class TransactionFrame extends javax.swing.JFrame {
             
             if(!isSsl.equals("no-SSL")){
                 int portSSL = Integer.parseInt(isSsl.substring(isSsl.lastIndexOf("#")+1));
-                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/key/acs_keystore.jks","password","password");
+                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/java/key/acs_keystore.jks","password","password");
                 SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket("localhost", portSSL);
                 ois = new ObjectInputStream(SslSocket.getInputStream());
                 oos = new ObjectOutputStream(SslSocket.getOutputStream());
@@ -173,17 +156,26 @@ public class TransactionFrame extends javax.swing.JFrame {
             
             //Envoie de la requête
             System.out.println("Envoie de la requête");
-            //String chargeUtile = NomTF.getText() + "#" + new String(PINTF.getPassword());
-            //RequeteAuth req = new RequeteAuth(RequeteAuth.REQUEST_AUTH,chargeUtile);
-            
-            //oos.writeObject(req);
+            String source = SourceTextField.getText();
+            String destination = DestinationTextField.getText();
+            double montant = (double) MontantSpinner.getValue();
+            String chargeUtile = source + "#"+destination;
+            RequetePay req= new RequetePay(RequetePay.REQUEST_PAY,chargeUtile, montant);
+
+            oos.writeObject(req);
             oos.flush();
             
             // Lecture de la réponse      
             System.out.println("Lecture de la réponse");
-            ReponseAuth rep = (ReponseAuth)ois.readObject();
+            ReponsePay rep = (ReponsePay)ois.readObject();
             System.out.println("Reponse reçue : " + rep.getChargeUtile());
-            
+            if(rep.getCode()==ReponsePay.PAY_OK){
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Transaction effectuée avec succès","Félicitation!",JOptionPane.WARNING_MESSAGE);
+            }else{
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Echec de la transaction","Pas Félicitation!",JOptionPane.ERROR_MESSAGE);
+            }
             
             //LReponse.setText(rep.getChargeUtile());
         } catch (IOException ex) {
@@ -230,15 +222,13 @@ public class TransactionFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField DestinationTextField;
-    private javax.swing.JScrollPane HistoriquePanel;
     private javax.swing.JSpinner MontantSpinner;
+    private javax.swing.JLabel Source;
     private javax.swing.JTextField SourceTextField;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }
