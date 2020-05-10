@@ -5,7 +5,6 @@
  */
 package pkg3dsecure.ACS.authServer;
 
-import pkg3dsecure.ACS.authServer.RequeteAuth;
 import javax.net.ssl.SSLServerSocketFactory;
 import serveurthreaddemande.ServeurPanel;
 
