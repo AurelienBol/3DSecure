@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utilitaires;
 
 import java.io.BufferedReader;
@@ -50,18 +45,18 @@ public class VerificationServer {
         while ((strLine = bfIn.readLine()) != null){
             System.out.println(strLine); // pour trace
             if (Trouve100(strLine)){
-                System.out.println("La machine " + adresse + " ne répond pas");
+                System.err.println("La machine " + adresse + " ne répond pas");
                 return false;
             }
         }
         bfIn.close();
         System.out.println("La machine " + adresse + " a répondu");
         return true;
-        }catch(IOException e){
-            System.out.println("Exception IO = " + e.getMessage());
+        }catch(IOException ex){
+            System.err.println("[VerificationServer : ping] Exception IO - " + ex);
         }
-        catch(Exception e){
-            System.out.println("Exception = " + e.getMessage());
+        catch(Exception ex){
+            System.out.println("[VerificationServer : ping] Exception - " + ex);
         }
         return false;
     }

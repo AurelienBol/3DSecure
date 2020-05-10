@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pkg3dsecure.ACS.authServer;
 
 import java.io.IOException;
@@ -112,8 +107,8 @@ public class RequeteAuth implements Requete, Serializable{
                 oos.writeObject(rep);
                 oos.flush();
                 oos.close();
-            }catch (IOException e){
-                System.err.println("Erreur réseau ? [" + e.getMessage() + "]");
+            }catch (IOException ex){
+                System.err.println("[RequeteAuth : traiteRequeteAuth] IOException - " + ex);
             }
         }else{
             String reponse;
@@ -125,12 +120,12 @@ public class RequeteAuth implements Requete, Serializable{
                 oos.writeObject(rep);
                 oos.flush();
                 oos.close();
-            }catch (IOException e){
-                System.err.println("Erreur réseau ? [" + e.getMessage() + "]");
+            }catch (IOException ex){
+                System.err.println("[RequeteAuth : traiteRequeteAuth] IOException - " + ex);
             }
         }
-        }
     }
+}
     private byte[] makeDigest(String date, String nom, String pin){
         try {
             MessageDigest md = MessageDigest.getInstance("SHA");

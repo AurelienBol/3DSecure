@@ -1,20 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Money;
 
-import Reqpay.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
-import java.util.StringTokenizer;
 import serveurthreaddemande.ConsoleServeur;
 import serveurthreaddemande.requetethreaddemande.Requete;
-import sql.BankAccount;
 import sql.BankTransaction;
 
 /**
@@ -93,8 +85,8 @@ public class RequeteMoney implements Requete, Serializable{
                 oos.writeObject(rep);
                 oos.flush();
                 oos.close();
-            }catch (IOException e){
-                System.err.println("Erreur réseau ? [" + e.getMessage() + "]");
+            }catch (IOException ex){
+                System.err.println("[RequeteMoney : traiteRequeteMoney] IOException - " + ex);
             }
         }else{
             ReponseMoney rep = new ReponseMoney(ReponseMoney.MONEY_OK, "Prêt pour le virement");
@@ -103,8 +95,8 @@ public class RequeteMoney implements Requete, Serializable{
                 oos.flush();
                 bankTransaction.pay(source,montant);
                 oos.close();
-            }catch (IOException e){
-                System.err.println("Erreur réseau ? [" + e.getMessage() + "]");
+            }catch (IOException ex){
+                System.err.println("[RequeteMoney : traiteRequeteMoney] IOException - " + ex);
             }
         }
     }

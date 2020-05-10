@@ -3,8 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/utilitaires/ServerProperties.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACQ/ACQMain.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACQ/reqpay.properties</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/Money/RequeteMoney.java</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/TransactionFrame.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/Money/moneyServeurPanel.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/ClientFrame.properties</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/TransactionFrame.properties</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/sql/ConnectionManager.java</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/utilitaires/VerificationServer.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACS/authServer/RequeteAuth.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/sql/BankAccount.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/sql/Client.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/ClientFrame.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/sql/BankTransaction.java</file>
         </group>
     </open-files>
 </project-private>

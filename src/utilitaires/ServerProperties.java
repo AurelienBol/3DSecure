@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utilitaires;
 
 import java.io.File;
@@ -45,14 +40,14 @@ public class ServerProperties {
             passwordKey = prop.getProperty("passwordKey");
 
         } catch (FileNotFoundException ex) {
-            System.err.println("FileNotFoundException - " + ex);
+            System.err.println("[ServerProperties : ServerProperties] FileNotFoundException  - " + ex);
         } catch (IOException ex) {
-            System.err.println("IOException - " + ex);
+            System.err.println("[ServerProperties : ServerProperties] IOException  - " + ex);
         } finally {
             try {
                 input.close();
             } catch (IOException ex) {
-                System.err.println("IOException - " + ex);
+                System.err.println("[ServerProperties : ServerProperties] IOException  - " + ex);
             }
         }
 
@@ -113,7 +108,7 @@ public class ServerProperties {
             prop.setProperty(key, value);
             prop.store(output, null);
         } catch (IOException ex) {
-            System.err.println("IOException - " + ex);
+            System.err.println("[ServerProperties : WriteProp] IOException  - " + ex);
         }
     }
     

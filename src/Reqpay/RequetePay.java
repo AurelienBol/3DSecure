@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Reqpay;
 
 import CertFile.CertFile;
@@ -18,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import pkg3dsecure.ACS.authServer.RequeteAuth;
 
 import serveurthreaddemande.ConsoleServeur;
 import serveurthreaddemande.requetethreaddemande.Requete;
@@ -63,7 +57,6 @@ public class RequetePay implements Requete, Serializable{
     public double getMontant(){
         return montant;
     }
-    
     
     @Override
     public Runnable createRunnable(ObjectInputStream ois, ObjectOutputStream oos, ConsoleServeur cs) {
@@ -153,9 +146,9 @@ public class RequetePay implements Requete, Serializable{
                     }
                 }
             }catch (IOException ex){
-                Logger.getLogger(RequetePay.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("[RequetePay : traiteRequetePay] IOException - " + ex);
             } catch (ClassNotFoundException ex) {
-                Logger.getLogger(RequetePay.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("[RequetePay : traiteRequetePay] ClassNotFoundException - " + ex);
             }
         }
     }

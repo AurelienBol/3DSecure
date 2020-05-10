@@ -1,17 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pkg3dsecure.Client;
 
 import CertFile.CertFile;
 import Reqpay.ReponsePay;
 import Reqpay.RequetePay;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Properties;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JFrame;
@@ -22,12 +22,21 @@ import javax.swing.JOptionPane;
  * @author Aurélien Bolkaerts
  */
 public class TransactionFrame extends javax.swing.JFrame {
-
+    private final String clientFramePropertiesPath = "src\\pkg3dsecure\\Client\\TransactionFrame.properties";
+    //Variables lues dans le fichier ClientFrame.properties
+    private String serverIP;
+    private int port;
+    private String certFileLocation;
+    private String certFilePassword;
+    private String certFileKeyPassword;
+    
+    
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Socket cliSock;
     
     public TransactionFrame() {
+        loadProperties();
         initComponents();
     }
 
@@ -48,7 +57,7 @@ public class TransactionFrame extends javax.swing.JFrame {
         DestinationTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         MontantSpinner = new javax.swing.JSpinner();
-        jButton1 = new javax.swing.JButton();
+        JButtonOk = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -100,17 +109,17 @@ public class TransactionFrame extends javax.swing.JFrame {
         gridBagConstraints.gridy = 3;
         getContentPane().add(MontantSpinner, gridBagConstraints);
 
-        jButton1.setText("Ok");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        JButtonOk.setText("Ok");
+        JButtonOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                JButtonOkActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
-        getContentPane().add(jButton1, gridBagConstraints);
+        getContentPane().add(JButtonOk, gridBagConstraints);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel4.setText("Demande de transaction");
@@ -123,7 +132,7 @@ public class TransactionFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void JButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JButtonOkActionPerformed
         try{
             //Vérification des champs
             if(SourceTextField.getText().length()!=8 || DestinationTextField.getText().length()!=8){
@@ -134,10 +143,9 @@ public class TransactionFrame extends javax.swing.JFrame {
             
             //Connexion au serveur sur le port non SSL
             System.out.println("Connexion au serveur sur le port non-SSL");
-            String adresse = "localhost";
-            int port = 2600;
+
             
-            cliSock = new Socket(adresse,port);
+            cliSock = new Socket(serverIP,port);
             ois = new ObjectInputStream(cliSock.getInputStream());
             oos = new ObjectOutputStream(cliSock.getOutputStream());
             
@@ -148,8 +156,8 @@ public class TransactionFrame extends javax.swing.JFrame {
             
             if(!isSsl.equals("no-SSL")){
                 int portSSL = Integer.parseInt(isSsl.substring(isSsl.lastIndexOf("#")+1));
-                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/java/key/acs_keystore.jks","password","password");
-                SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket("localhost", portSSL);
+                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory(certFileLocation,certFilePassword,certFileKeyPassword);
+                SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket(serverIP, portSSL);
                 ois = new ObjectInputStream(SslSocket.getInputStream());
                 oos = new ObjectOutputStream(SslSocket.getOutputStream());
             }
@@ -179,11 +187,11 @@ public class TransactionFrame extends javax.swing.JFrame {
             
             //LReponse.setText(rep.getChargeUtile());
         } catch (IOException ex) {
-            System.err.println("IOException - " + ex);
+            System.err.println("[TransactionFrame : JButtonOkActionPerformed] IOException - " + ex);
         } catch (ClassNotFoundException ex) {
-            System.err.println("ClassNotFoundException - " + ex);
+            System.err.println("[TransactionFrame : JButtonOkActionPerformed] ClassNotFoundException - " + ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_JButtonOkActionPerformed
 
     /**
      * @param args the command line arguments
@@ -222,13 +230,39 @@ public class TransactionFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField DestinationTextField;
+    private javax.swing.JButton JButtonOk;
     private javax.swing.JSpinner MontantSpinner;
     private javax.swing.JLabel Source;
     private javax.swing.JTextField SourceTextField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+    
+    private void loadProperties() { 
+       File clientFramePropertiesFile = new File(clientFramePropertiesPath);
+        InputStream input = null;
+        try {
+            input = new FileInputStream(clientFramePropertiesFile);
+            Properties prop = new Properties();
+            prop.load(input);
+            serverIP = prop.getProperty("serverIP");
+            port = Integer.parseInt(prop.getProperty("port"));
+            certFileLocation = prop.getProperty("certFileLocation");
+            certFilePassword = prop.getProperty("certFilePassword");
+            certFileKeyPassword = prop.getProperty("certFileKeyPassword");
+        } catch (FileNotFoundException ex) {
+            System.err.println("[TransactionFrame : loadProperties] FileNotFoundException - " + ex);
+        } catch (IOException ex) {
+            System.err.println("[TransactionFrame : loadProperties] IOException - " + ex);
+        } finally {
+            try {
+                input.close();
+            } catch (IOException ex) {
+                System.err.println("[TransactionFrame : loadProperties] IOException - " + ex);
+            }
+        }
+    }
+
 }

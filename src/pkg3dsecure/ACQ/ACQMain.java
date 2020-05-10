@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pkg3dsecure.ACQ;
 
 import CertFile.CertFile;
@@ -14,7 +9,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import serveurthreaddemande.ServeurPanel;
 import utilitaires.ServerProperties;
 import utilitaires.VerificationServer;
 
@@ -73,7 +67,7 @@ public class ACQMain {
     private static JPanel makeReqPayServeurPanel(String titre, int port, int portSSL, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
         VerificationServer vs = new VerificationServer();
         if(!vs.ping("127.0.0.1")){
-            System.out.println("Le serveur money doit être lancé");
+            System.err.println("[ACQMain : makeRePayServeurPanel] Impossible de ping le serveur");
             JFrame f = new JFrame();
             JOptionPane.showMessageDialog(f,"Le serveur ACS doit être lancé avant celui-ci","Démarrage du serveur ACS nécessaire!",JOptionPane.ERROR_MESSAGE);
             exit(-1);

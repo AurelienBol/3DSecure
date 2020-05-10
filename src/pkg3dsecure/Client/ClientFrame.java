@@ -1,46 +1,51 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pkg3dsecure.Client;
 
 import CertFile.CertFile;
-import java.awt.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import pkg3dsecure.ACS.authServer.ReponseAuth;
 import pkg3dsecure.ACS.authServer.RequeteAuth;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author Aurélien Bolkaerts
  */
-public class ClientFrame extends javax.swing.JFrame {
 
+
+public class ClientFrame extends javax.swing.JFrame {
+    private final String clientFramePropertiesPath = "src\\pkg3dsecure\\Client\\ClientFrame.properties";
+    //Variables lues dans le fichier ClientFrame.properties
+    private String serverIP;
+    private int port;
+    private String certFileLocation;
+    private String certFilePassword;
+    private String certFileKeyPassword;
+    
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Socket cliSock;
     
    public ClientFrame() {
+        loadProperties();
         initComponents();
     }
 
@@ -158,12 +163,8 @@ public class ClientFrame extends javax.swing.JFrame {
             }
             
             //Connexion au serveur sur le port non SSL
-            System.out.println("Connexion au serveur sur le port non-SSL");
-            String adresse = "localhost";
-            
-            int port = 2500;
-            
-            cliSock = new Socket(adresse,port);
+            System.out.println("Connexion au serveur sur le port non-SSL");      
+            cliSock = new Socket(serverIP,port);
             ois = new ObjectInputStream(cliSock.getInputStream());
             oos = new ObjectOutputStream(cliSock.getOutputStream());
             
@@ -173,8 +174,8 @@ public class ClientFrame extends javax.swing.JFrame {
             System.out.println("SSL - " + isSsl);
             if(!isSsl.equals("no-SSL")){
                 int portSSL = Integer.parseInt(isSsl.substring(isSsl.lastIndexOf("#")+1));
-                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/java/key/acs_keystore.jks","password","password");
-                SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket("localhost", portSSL);
+                SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory(certFileLocation,certFilePassword,certFileKeyPassword);
+                SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket(serverIP, portSSL);
                 ois = new ObjectInputStream(SslSocket.getInputStream());
                 oos = new ObjectOutputStream(SslSocket.getOutputStream());
             }
@@ -219,9 +220,9 @@ public class ClientFrame extends javax.swing.JFrame {
             
             //LReponse.setText(rep.getChargeUtile());
         } catch (IOException ex) {
-            System.err.println("IOException - " + ex);
+            System.err.println("[ClientFrame : AuthButtonActionPerformed] IOException - " + ex);
         } catch (ClassNotFoundException ex) {
-            System.err.println("ClassNotFoundException - " + ex);
+            System.err.println("[ClientFrame : AuthButtonActionPerformed] ClassNotFoundException - " + ex);
         }
 
     }//GEN-LAST:event_AuthButtonActionPerformed
@@ -235,7 +236,7 @@ public class ClientFrame extends javax.swing.JFrame {
             byte[] digest = md.digest();
             return digest;
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("[ClientFrame : makeDigest] NoSuchAlgorithmException - " + ex);
         }
         return null;
     }
@@ -290,4 +291,29 @@ public class ClientFrame extends javax.swing.JFrame {
     private javax.swing.JPasswordField PINTF;
     private javax.swing.JPanel RequestPanel;
     // End of variables declaration//GEN-END:variables
+
+    private void loadProperties() {
+        File clientFramePropertiesFile = new File(clientFramePropertiesPath);
+        InputStream input = null;
+        try {
+            input = new FileInputStream(clientFramePropertiesFile);
+            Properties prop = new Properties();
+            prop.load(input);
+            serverIP = prop.getProperty("serverIP");
+            port = Integer.parseInt(prop.getProperty("port"));
+            certFileLocation = prop.getProperty("certFileLocation");
+            certFilePassword = prop.getProperty("certFilePassword");
+            certFileKeyPassword = prop.getProperty("certFileKeyPassword");
+        } catch (FileNotFoundException ex) {
+            System.err.println("[ClientFrame : loadProperties] FileNotFoundException - " + ex);
+        } catch (IOException ex) {
+            System.err.println("[ClientFrame : loadProperties] IOException - " + ex);
+        } finally {
+            try {
+                input.close();
+            } catch (IOException ex) {
+                System.err.println("[ClientFrame : loadProperties] IOException - " + ex);
+            }
+        }
+    }
 }

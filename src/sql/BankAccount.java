@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package sql;
 
 import java.sql.Connection;
@@ -24,7 +19,7 @@ public class BankAccount {
                 System.out.println("Connection à la base de données réussie");
                 
             } else {
-                System.out.println("Echec de la connection à la base de données!");
+                System.err.println("Echec de la connection à la base de données!");
             }
 
         } catch (SQLException e) {
