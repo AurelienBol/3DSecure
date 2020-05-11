@@ -57,6 +57,7 @@ public class ACQMain {
         tabbedPane.addTab(spReqpay.getTitle(), makeReqPayServeurPanel(spReqpay.getTitle(),
                                                                 spReqpay.getPort(),
                                                                 spReqpay.getPortSSL(),
+                                                                spReqpay.getIP(),
                                                                 spReqpay.getFichierKeystore(),
                                                                 spReqpay.getPasswordKeystore(),
                                                                 spReqpay.getPasswordKey()));
@@ -64,7 +65,7 @@ public class ACQMain {
         frame.getContentPane().add(tabbedPane);
     }
     
-    private static JPanel makeReqPayServeurPanel(String titre, int port, int portSSL, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+    private static JPanel makeReqPayServeurPanel(String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
         VerificationServer vs = new VerificationServer();
         if(!vs.ping("127.0.0.1")){
             System.err.println("[ACQMain : makeRePayServeurPanel] Impossible de ping le serveur");
@@ -73,7 +74,7 @@ public class ACQMain {
             exit(-1);
         }
         vs.SNMPRequest("test");
-        reqpayPanel sp = new reqpayPanel(titre,port,portSSL,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
+        reqpayPanel sp = new reqpayPanel(titre,port,portSSL,ip,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
         JPanel p = new JPanel();
         p.add(sp);
         p.setLayout(new GridLayout(1,1));

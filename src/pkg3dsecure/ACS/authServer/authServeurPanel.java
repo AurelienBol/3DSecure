@@ -10,10 +10,10 @@ import serveurthreaddemande.ServeurPanel;
 
 public class authServeurPanel extends ServeurPanel{
     RequeteAuth req = null;
-    public authServeurPanel(String name, int p) {
-        super(name, p,RequeteAuth.class);
+    public authServeurPanel(String name, int p, String ip) {
+        super(name, p,ip,RequeteAuth.class);
     }
-    public authServeurPanel(String name, int p, int pSSL, SSLServerSocketFactory SslSFac) {
-        super(name, p, pSSL, SslSFac,RequeteAuth.class);
+    public authServeurPanel(String name, int p, int pSSL, String ip, SSLServerSocketFactory SslSFac) {
+        super(name, p, pSSL, ip,SslSFac,RequeteAuth.class);
     }
 }

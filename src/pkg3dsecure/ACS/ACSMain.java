@@ -57,6 +57,7 @@ public class ACSMain {
         tabbedPane.addTab(spAuth.getTitle(), makeAuthServeurPanel(spAuth.getTitle(),
                                                                 spAuth.getPort(),
                                                                 spAuth.getPortSSL(),
+                                                                spAuth.getIP(),
                                                                 spAuth.getFichierKeystore(),
                                                                 spAuth.getPasswordKeystore(),
                                                                 spAuth.getPasswordKey()));
@@ -65,6 +66,7 @@ public class ACSMain {
         tabbedPane.addTab(spMoney.getTitle(), makeMoneyServeurPanel(spMoney.getTitle(),
                                                                 spMoney.getPort(),
                                                                 spMoney.getPortSSL(),
+                                                                spMoney.getIP(),
                                                                 spMoney.getFichierKeystore(),
                                                                 spMoney.getPasswordKeystore(),
                                                                 spMoney.getPasswordKey()));
@@ -72,8 +74,8 @@ public class ACSMain {
         frame.getContentPane().add(tabbedPane);
     }
     
-    private static JPanel makeAuthServeurPanel(String titre, int port, int portSSL, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
-        authServeurPanel sp = new authServeurPanel(titre,port,portSSL,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
+    private static JPanel makeAuthServeurPanel(String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+        authServeurPanel sp = new authServeurPanel(titre,port,portSSL,ip,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
         JPanel p = new JPanel();
         p.add(sp);
         p.setLayout(new GridLayout(1,1));
@@ -81,8 +83,8 @@ public class ACSMain {
     }
     
     
-    private static JPanel makeMoneyServeurPanel(String titre, int port, int portSSL, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
-        moneyServeurPanel msp = new moneyServeurPanel(titre,port,portSSL,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
+    private static JPanel makeMoneyServeurPanel(String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+        moneyServeurPanel msp = new moneyServeurPanel(titre,port,portSSL,ip,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
         JPanel p = new JPanel();
         p.add(msp);
         p.setLayout(new GridLayout(1,1));

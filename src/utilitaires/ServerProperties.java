@@ -22,6 +22,7 @@ public class ServerProperties {
     private String fichierKeystore;
     private String passwordKeystore;
     private String passwordKey;
+    private String ip;
     
     
     public ServerProperties(File file){
@@ -38,6 +39,7 @@ public class ServerProperties {
             fichierKeystore = prop.getProperty("fichierKeystore");
             passwordKeystore = prop.getProperty("passwordKeystore");
             passwordKey = prop.getProperty("passwordKey");
+            ip = prop.getProperty("ip");
 
         } catch (FileNotFoundException ex) {
             System.err.println("[ServerProperties : ServerProperties] FileNotFoundException  - " + ex);
@@ -102,6 +104,13 @@ public class ServerProperties {
         return passwordKey;
     }
     
+    public void setIp(String ip){
+        WriteProp("ip",ip);
+    }
+    public String getIP(){
+        return ip;
+    }
+    
     private void WriteProp(String key, String value){
         try (OutputStream output = new FileOutputStream(propFile)) {
             Properties prop = new Properties();
@@ -122,6 +131,7 @@ public class ServerProperties {
         s += "\t" + "Fichier keystore = " + fichierKeystore + System.lineSeparator();
         s += "\t" + "Password keystore = " + passwordKeystore + System.lineSeparator();
         s += "\t" + "Password key = " + passwordKey + System.lineSeparator();
+        s += "\t" + "IP = " + ip + System.lineSeparator();
         return s;
     }
 }
