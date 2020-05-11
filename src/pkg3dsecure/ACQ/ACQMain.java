@@ -16,6 +16,7 @@ import utilitaires.VerificationServer;
  *
  * @author Aurélien Bolkaerts
  */
+
 public class ACQMain {
     static ServerProperties spReqpay, spMoney;
     public static void main(String[] args) {
@@ -73,7 +74,15 @@ public class ACQMain {
             JOptionPane.showMessageDialog(f,"Le serveur ACS doit être lancé avant celui-ci","Démarrage du serveur ACS nécessaire!",JOptionPane.ERROR_MESSAGE);
             exit(-1);
         }
-        vs.SNMPRequest("test");
+        String result = vs.getNameSNMP("192.168.0.40");
+
+        if(result!=null && result !="" &&result !=" "){
+            String name = result.split(" = ")[1];
+            System.out.println("Name = " +name);
+        }else{
+            System.out.println("Pas de réponse SNMP");
+        }
+        
         reqpayPanel sp = new reqpayPanel(titre,port,portSSL,ip,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
         JPanel p = new JPanel();
         p.add(sp);

@@ -76,28 +76,29 @@ public class VerificationServer {
         return false;
     }
     
-    public boolean SNMPRequest(String nom){
+    public String getNameSNMP(String adresse){
         try{
             TransportMapping transport=null;
             transport = new DefaultUdpTransportMapping();
             transport.listen();
             
-            
             CommunityTarget target = new CommunityTarget();
             target.setVersion(SnmpConstants.version1);
-            target.setCommunity(new OctetString("Oupeye"));
+            
+            target.setCommunity(new OctetString("public"));
             Address targetAddress;
-            targetAddress = GenericAddress.parse("udp:192.168.1.3/161");
+            targetAddress = GenericAddress.parse("udp:"+adresse+"/161");
             target.setAddress(targetAddress);
             target.setRetries(2);
             target.setTimeout(1500);
+            
             PDU pdu = new PDU();
-            pdu.setType(PDU.SET);
-            pdu.add(new VariableBinding(new OID(new int[]{1,3,6,1,2,1,1,4,0}),
-                    new OctetString(nom)));
+            pdu.setType(PDU.GET);
+            pdu.add(new VariableBinding(new OID(new int[]{1,3,6,1,2,1,1,5,0})));
+            
             Snmp snmp = new Snmp(transport);
             ResponseEvent paquetReponse = null;
-            paquetReponse = snmp.set(pdu, target);
+            paquetReponse = snmp.get(pdu, target);
             System.out.println("Requete SNMP envoyée à l'agent");
 
             if (paquetReponse !=null){
@@ -108,15 +109,14 @@ public class VerificationServer {
                     Vector vecReponse = pduReponse.getVariableBindings();
                     for (int i=0; i<vecReponse.size(); i++){
                        System.out.println("Elément n°"+i+ " : "+vecReponse.elementAt(i));
+                       return vecReponse.elementAt(i).toString();
                     }
-                    return true;
                 }
-                return false;
             }
-            return false;
         }
         catch (IOException ex){ 
             Logger.getLogger(VerificationServer.class.getName()).log(Level.SEVERE, null, ex); }
-        return false;
+            return "";    
         }
+        
     }
