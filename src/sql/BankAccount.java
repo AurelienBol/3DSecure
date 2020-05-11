@@ -14,7 +14,7 @@ import java.sql.Statement;
 public class BankAccount {
     public void connect(){
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACQ", "oracle")) {
+                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACQ", "oracle")) {
             if (conn != null) {
                 System.out.println("Connection à la base de données réussie");
                 
@@ -31,7 +31,7 @@ public class BankAccount {
     
     public boolean exist(String accountNumber){
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACQ", "oracle")) {
+                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACQ", "oracle")) {
             if (conn != null) {
                 System.out.println("Vérification de l'existance du compte sur ACQ");
                 Statement stmt = conn.createStatement();
@@ -56,7 +56,7 @@ public class BankAccount {
     
     public boolean gain(String accountNumber, double value){
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACQ", "oracle")) {
+                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACQ", "oracle")) {
             if (conn != null) {
                 System.out.println("Transaction en cours sur ACQ");
                 PreparedStatement ps = conn.prepareStatement("UPDATE account set account_solde = account_solde + " + value + " where account_number = '" + accountNumber+"'");;

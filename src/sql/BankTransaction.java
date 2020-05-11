@@ -14,7 +14,7 @@ import java.sql.Statement;
 public class BankTransaction {
     public double getSolde(String accountNumber){
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACS", "oracle")) {
+                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACS", "oracle")) {
             if (conn != null) {
                 System.out.println("Vérification du solde sur ACS");
                 Statement stmt = conn.createStatement();
@@ -39,7 +39,7 @@ public class BankTransaction {
     
     public boolean pay(String accountNumber, double value){
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACS", "oracle")) {
+                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACS", "oracle")) {
             if (conn != null) {
                 System.out.println("Transaction en cours sur ACS");
                 PreparedStatement ps = conn.prepareStatement("UPDATE account set account_solde = account_solde - " + value + " where account_number = '" + accountNumber+"'");;

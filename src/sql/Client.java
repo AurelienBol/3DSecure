@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class Client {
     public String getPassword(String user){
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACS", "oracle")) {
+                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACS", "oracle")) {
             if (conn != null) {
                 System.out.println("Connection à la base de données réussie");
                 Statement stmt = conn.createStatement();
