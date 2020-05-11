@@ -4,11 +4,14 @@ import Money.moneyServeurPanel;
 import pkg3dsecure.ACS.authServer.authServeurPanel;
 import java.awt.GridLayout;
 import java.io.File;
+import static java.lang.System.exit;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import utilitaires.ServerProperties;
+import utilitaires.VerificationServer;
 
 /**
  *
@@ -63,7 +66,9 @@ public class ACSMain {
                                                                 spAuth.getPasswordKey()));
         
         System.out.println(spMoney);
-        tabbedPane.addTab(spMoney.getTitle(), makeMoneyServeurPanel(spMoney.getTitle(),
+        tabbedPane.addTab(spMoney.getTitle(), makeMoneyServeurPanel(spMoney.getOtherServer(),
+                                                                spMoney.getOtherServerName(),
+                                                                spMoney.getTitle(),
                                                                 spMoney.getPort(),
                                                                 spMoney.getPortSSL(),
                                                                 spMoney.getIP(),
@@ -83,7 +88,31 @@ public class ACSMain {
     }
     
     
-    private static JPanel makeMoneyServeurPanel(String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+    private static JPanel makeMoneyServeurPanel(String ACQ,String ACQName, String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+        VerificationServer vs = new VerificationServer();
+        if(!vs.ping(ACQ)){
+            System.err.println("[ACQMain : makeRePayServeurPanel] Impossible de ping le serveur ACQ");
+            JFrame f = new JFrame();
+            JOptionPane.showMessageDialog(f,"Ping raté","Démarrage du serveur ACQ nécessaire!",JOptionPane.ERROR_MESSAGE);
+            exit(-1);
+        }
+        String result = vs.getNameSNMP(ACQ);
+
+        if(result!=null && result !="" &&result !=" "){
+            String name = result.split(" = ")[1];
+            System.out.println("Name = " +name);
+            if(name.equalsIgnoreCase(ACQName)){
+                System.out.println("Good to go!");
+            }else{
+                System.err.println("Requête du nom ratée :(");
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Requête du nom ratée :(","Démarrage du serveur ACQ nécessaire!",JOptionPane.ERROR_MESSAGE);
+                exit(-1);
+            }
+        }else{
+            System.out.println("Pas de réponse SNMP");
+        }
+        
         moneyServeurPanel msp = new moneyServeurPanel(titre,port,portSSL,ip,CertFile.getSSLServerSocketFactory(FICHIER_KEYSTORE, PASSWD_KEYSTORE, PASSWD_KEY));
         JPanel p = new JPanel();
         p.add(msp);

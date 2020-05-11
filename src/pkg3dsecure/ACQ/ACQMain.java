@@ -55,7 +55,9 @@ public class ACQMain {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
  
         System.out.println(spReqpay);
-        tabbedPane.addTab(spReqpay.getTitle(), makeReqPayServeurPanel(spReqpay.getTitle(),
+        tabbedPane.addTab(spReqpay.getTitle(), makeReqPayServeurPanel(spReqpay.getOtherServer(),
+                                                                spReqpay.getOtherServerName(),
+                                                                spReqpay.getTitle(),
                                                                 spReqpay.getPort(),
                                                                 spReqpay.getPortSSL(),
                                                                 spReqpay.getIP(),
@@ -66,19 +68,27 @@ public class ACQMain {
         frame.getContentPane().add(tabbedPane);
     }
     
-    private static JPanel makeReqPayServeurPanel(String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
+    private static JPanel makeReqPayServeurPanel(String ACS,String ACSName, String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
         VerificationServer vs = new VerificationServer();
-        if(!vs.ping("127.0.0.1")){
-            System.err.println("[ACQMain : makeRePayServeurPanel] Impossible de ping le serveur");
+        if(!vs.ping(ACS)){
+            System.err.println("[ACQMain : makeRePayServeurPanel] Impossible de ping le serveur ACS");
             JFrame f = new JFrame();
             JOptionPane.showMessageDialog(f,"Le serveur ACS doit être lancé avant celui-ci","Démarrage du serveur ACS nécessaire!",JOptionPane.ERROR_MESSAGE);
             exit(-1);
         }
-        String result = vs.getNameSNMP("192.168.0.40");
+        String result = vs.getNameSNMP(ACS);
 
         if(result!=null && result !="" &&result !=" "){
             String name = result.split(" = ")[1];
             System.out.println("Name = " +name);
+            if(name.equalsIgnoreCase(ACSName)){
+                System.out.println("Good to go!");
+            }else{
+                System.err.println("Requête du nom ratée :(");
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,"Requête du nom ratée :(","Démarrage du serveur ACS nécessaire!",JOptionPane.ERROR_MESSAGE);
+                exit(-1);
+            }
         }else{
             System.out.println("Pas de réponse SNMP");
         }
