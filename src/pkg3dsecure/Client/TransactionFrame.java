@@ -142,7 +142,7 @@ public class TransactionFrame extends javax.swing.JFrame {
             }
             
             //Connexion au serveur sur le port non SSL
-            System.out.println("Connexion au serveur sur le port non-SSL");
+             System.out.println("Connexion au serveur " + serverIP + " sur le port non-SSL " + port); 
 
             
             cliSock = new Socket(serverIP,port);

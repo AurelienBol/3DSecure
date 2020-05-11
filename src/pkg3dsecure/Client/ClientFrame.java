@@ -163,7 +163,7 @@ public class ClientFrame extends javax.swing.JFrame {
             }
             
             //Connexion au serveur sur le port non SSL
-            System.out.println("Connexion au serveur sur le port non-SSL");      
+            System.out.println("Connexion au serveur " + serverIP + " sur le port non-SSL " + port); 
             cliSock = new Socket(serverIP,port);
             ois = new ObjectInputStream(cliSock.getInputStream());
             oos = new ObjectOutputStream(cliSock.getOutputStream());

@@ -8,9 +8,12 @@
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACQ/reqpay.properties</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACS/money.properties</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACQ/money.properties</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/TransactionFrame.java</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/ClientFrame.properties</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/TransactionFrame.properties</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/utilitaires/VerificationServer.java</file>
             <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/Client/ClientFrame.java</file>
+            <file>file:/D:/Cours/ISIL/Travaux%20M18/3DSecure/src/pkg3dsecure/ACS/ACSMain.java</file>
         </group>
     </open-files>
 </project-private>
