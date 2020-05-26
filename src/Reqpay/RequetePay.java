@@ -3,6 +3,7 @@ package Reqpay;
 import CertFile.CertFile;
 import Money.ReponseMoney;
 import Money.RequeteMoney;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,6 +18,8 @@ import javax.net.ssl.SSLSocketFactory;
 import serveurthreaddemande.ConsoleServeur;
 import serveurthreaddemande.requetethreaddemande.Requete;
 import sql.BankAccount;
+import sql.ConnectionManager;
+import utilitaires.SqlProperties;
 
 /**
  *
@@ -70,6 +73,17 @@ public class RequetePay implements Requete, Serializable{
     }
     
     private void traiteRequetePay(ObjectInputStream ois, ObjectOutputStream oos, ConsoleServeur cs){
+        File sqlPropertiesFile = new File("src\\pkg3dsecure\\ACQ\\sql.properties");
+        SqlProperties sqlProperties = new SqlProperties(sqlPropertiesFile);
+        ConnectionManager cm = new ConnectionManager(sqlProperties.getDriverName(), 
+                sqlProperties.getServerIP(),
+                Integer.toString(sqlProperties.getServerPort()), 
+                sqlProperties.getService(), 
+                sqlProperties.getUrlStringHeader(), 
+                sqlProperties.getUsername(), 
+                sqlProperties.getPassword());
+
+        
         // Affichage des informations
         //String adresseDistante = sock.getRemoteSocketAddress().toString();
         String adresseDistante = " client";
@@ -87,6 +101,7 @@ public class RequetePay implements Requete, Serializable{
         
         //Vérification de l'authentification
         BankAccount bankAccount = new BankAccount();
+        bankAccount.setCon(cm.getConnection());
         boolean exist = bankAccount.exist(destination);
         
         // Construction d'une réponse
@@ -106,7 +121,7 @@ public class RequetePay implements Requete, Serializable{
                 System.out.println("LE COMPTE DESTINATION A ETE TROUVE");
                 //Connexion au serveur sur le port non SSL
                 System.out.println("Connexion au serveur sur le port non-SSL");
-                String adresse = "localhost";
+                String adresse = "192.168.0.11";
                 
                 int portM = 2400;
                 
@@ -120,8 +135,8 @@ public class RequetePay implements Requete, Serializable{
                 System.out.println("SSL - " + isSsl);
                 if(!isSsl.equals("no-SSL")){
                     int portSSL = Integer.parseInt(isSsl.substring(isSsl.lastIndexOf("#")+1));
-                    SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("C:/Users/Aurélien Bolkaerts/Desktop/java/key/acs_keystore.jks","password","password");
-                    SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket("localhost", portSSL);
+                    SSLSocketFactory SslSFac = CertFile.getSSLClientSocketFactory("keystore/ACS.jks","password","password");
+                    SSLSocket SslSocket = (SSLSocket) SslSFac.createSocket(adresse, portSSL);
                     oism = new ObjectInputStream(SslSocket.getInputStream());
                     oosm = new ObjectOutputStream(SslSocket.getOutputStream());
                     

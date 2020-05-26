@@ -1,5 +1,6 @@
 package Money;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -8,6 +9,9 @@ import java.net.Socket;
 import serveurthreaddemande.ConsoleServeur;
 import serveurthreaddemande.requetethreaddemande.Requete;
 import sql.BankTransaction;
+import sql.ConnectionManager;
+import utilitaires.ServerProperties;
+import utilitaires.SqlProperties;
 
 /**
  *
@@ -74,7 +78,18 @@ public class RequeteMoney implements Requete, Serializable{
         cs.TraceEvenements(adresseDistante+"#Demande de payement de " + montant + " depuis " + source);
         
         //Vérification du solde actuel
+        File sqlPropertiesFile = new File("src\\pkg3dsecure\\ACS\\sql.properties");
+        SqlProperties sqlProperties = new SqlProperties(sqlPropertiesFile);
+        ConnectionManager cm = new ConnectionManager(sqlProperties.getDriverName(), 
+                sqlProperties.getServerIP(),
+                Integer.toString(sqlProperties.getServerPort()), 
+                sqlProperties.getService(), 
+                sqlProperties.getUrlStringHeader(), 
+                sqlProperties.getUsername(), 
+                sqlProperties.getPassword());
         BankTransaction bankTransaction = new BankTransaction();
+        bankTransaction.setCon(cm.getConnection());
+        
         Double soldeActuel = bankTransaction.getSolde(source);
         System.out.println("Solde actuel = " + soldeActuel);
         System.out.flush();

@@ -13,51 +13,28 @@ import java.util.logging.Logger;
  * @author Aurélien Bolkaerts
  */
 public class Client {
+    Connection con; 
+    public void setCon(Connection con){
+        this.con = con;
+    }
     public String getPassword(String user){
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@192.168.0.43:1521/orcl", "BD_ACS", "oracle")) {
-            if (conn != null) {
-                System.out.println("Connection à la base de données réussie");
-                Statement stmt = conn.createStatement();
-                String sql = "SELECT login_password from login where login_user = '" + user+"'";
-                System.out.println(sql);
-                ResultSet rs = stmt.executeQuery(sql);
-                if (rs.next()) {
-                    String password = rs.getString("login_password");
-                    return password;
+            if (con != null) {
+                try {
+                    System.out.println("Connection à la base de données réussie");
+                    Statement stmt = con.createStatement();
+                    String sql = "SELECT login_password from login where login_user = '" + user+"'";
+                    System.out.println(sql);
+                    ResultSet rs = stmt.executeQuery(sql);
+                    if (rs.next()) {
+                        String password = rs.getString("login_password");
+                        return password;
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 System.out.println("Echec de la connection à la base de données!");
-            }
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }   
+            } 
         return null;
-    }/*
-    public String getNom(String user){
-        try (Connection conn = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521/orcl", "BD_ACS", "oracle")) {
-            if (conn != null) {
-                System.out.println("Connection à la base de données réussie");
-                Statement stmt = conn.createStatement();
-                String sql = "SELECT client_id from login where login_user = '" + user+"'";
-                System.out.println(sql);
-                ResultSet rs = stmt.executeQuery(sql);
-                if (rs.next()) {
-                    String client_id = rs.getString("login_password");
-                    return password;
-                }
-            } else {
-                System.out.println("Echec de la connection à la base de données!");
-            }
-        } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }   
-        return null;
-    }*/
-    
+    }
 }

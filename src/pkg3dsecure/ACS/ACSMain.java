@@ -91,7 +91,7 @@ public class ACSMain {
     private static JPanel makeMoneyServeurPanel(String ACQ,String ACQName, String titre, int port, int portSSL,String ip, String FICHIER_KEYSTORE,String PASSWD_KEYSTORE, String PASSWD_KEY){
         VerificationServer vs = new VerificationServer();
         if(!vs.ping(ACQ)){
-            System.err.println("[ACQMain : makeRePayServeurPanel] Impossible de ping le serveur ACQ");
+            System.err.println("[ACSMain : makeMoneyServeurPanel] Impossible de ping le serveur ACQ");
             JFrame f = new JFrame();
             JOptionPane.showMessageDialog(f,"Ping raté","Démarrage du serveur ACQ nécessaire!",JOptionPane.ERROR_MESSAGE);
             exit(-1);

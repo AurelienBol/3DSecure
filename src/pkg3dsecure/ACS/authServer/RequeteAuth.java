@@ -1,5 +1,6 @@
 package pkg3dsecure.ACS.authServer;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +15,9 @@ import pkg3dsecure.Client.ClientFrame;
 import serveurthreaddemande.ConsoleServeur;
 import serveurthreaddemande.requetethreaddemande.Requete;
 import sql.Client;
+import sql.ConnectionManager;
+import utilitaires.ServerProperties;
+import utilitaires.SqlProperties;
 
 /**
  *
@@ -68,6 +72,16 @@ public class RequeteAuth implements Requete, Serializable{
     }
     
     private void traiteRequeteAuth(ObjectInputStream ois, ObjectOutputStream oos, ConsoleServeur cs){
+        File sqlPropertiesFile = new File("src\\pkg3dsecure\\ACS\\sql.properties");
+        SqlProperties sqlProperties = new SqlProperties(sqlPropertiesFile);
+        ConnectionManager cm = new ConnectionManager(sqlProperties.getDriverName(), 
+                sqlProperties.getServerIP(),
+                Integer.toString(sqlProperties.getServerPort()), 
+                sqlProperties.getService(), 
+                sqlProperties.getUrlStringHeader(), 
+                sqlProperties.getUsername(), 
+                sqlProperties.getPassword());
+        
         // Affichage des informations
         //String adresseDistante = sock.getRemoteSocketAddress().toString();
         String adresseDistante = " client";
@@ -84,7 +98,11 @@ public class RequeteAuth implements Requete, Serializable{
         cs.TraceEvenements(adresseDistante+"#Demande d'authentification de "+ nom);
         
         //Vérification de l'authentification
+        File sqlFile = new File("src\\pkg3dsecure\\ACS\\sql.properties");
+        
+        
         Client client = new Client();
+        client.setCon(cm.getConnection());
         String password = client.getPassword(nom);
         
         boolean isOk = false;
